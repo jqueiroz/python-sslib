@@ -10,7 +10,7 @@ class Polynomial:
         if not isinstance(prime_mod, int):
             raise TypeError("prime mod must be an int")
         if prime_mod <= 1:
-            raise TypeError("invalid prime mod")
+            raise ValueError("invalid prime mod")
         if len(coefficients) >= prime_mod:
             raise ValueError("prime mod must exceed number of coefficients")
         for coefficient in coefficients:
@@ -101,14 +101,14 @@ def recover_secret(data):
     if not prime_mod_bytes:
         raise ValueError("prime mod must be provided")
     if not isinstance(prime_mod_bytes, bytes):
-        raise ValueError("prime mod must be an array of bytes")
+        raise TypeError("prime mod must be an array of bytes")
     prime_mod = util.int_from_bytes(prime_mod_bytes)
     points = []
     for x, y in shares:
         if not isinstance(x, int):
-            raise ValueError("the first entry of each a share must be an int")
+            raise TypeError("the first entry of each a share must be an int")
         if not isinstance(y, bytes):
-            raise ValueError("the second entry of each a share must be an array of bytes")
+            raise TypeError("the second entry of each a share must be an array of bytes")
         points.append((x, util.int_from_bytes(y)))
     return util.int_to_bytes(lagrange_interpolation(0, points, prime_mod))[1:]
 
