@@ -113,4 +113,4 @@ The current implementation of Shamir's algorithm only supports splitting secrets
 The recommended approach for larger secrets is to perform encryption using a symmetric-key algorithm (such as AES) and then split the encryption key.
 
 ### Implementation details
-Internally, the secret is converted to an integer by interpreting its bytes in Big-Endian. Since the first bytes of the secret could be zero, the magic byte ````b'*'```` is always prepended before conversion. Upon recovery, the first byte of the secret is subsequently discarded.
+Internally, the secret is converted to an integer by interpreting its bytes in Big-Endian. Since the first bytes of the secret could be zero, the magic byte ````b'*'```` is always prepended before conversion. Upon recovery, this first byte is subsequently discarded.
