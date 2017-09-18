@@ -97,12 +97,15 @@ def recover_secret(data):
         shares = shares[0:required_shares]
     else:
         warnings.warn("The number of required shares has not been specified. If not enough shares are provided, an incorrect secret will be produced without detection.")
-    prime_mod_bytes = data.get('prime_mod')
-    if not prime_mod_bytes:
+    prime_mod = data.get('prime_mod')
+    if prime_mod is None:
         raise ValueError("prime mod must be provided")
-    if not isinstance(prime_mod_bytes, bytes):
-        raise TypeError("prime mod must be an array of bytes")
-    prime_mod = util.int_from_bytes(prime_mod_bytes)
+    if isinstance(prime_mod, bytes):
+        prime_mod = util.int_from_bytes(prime_mod)
+    if not isinstance(prime_mod, int):
+        raise TypeError("invalid prime mod")
+    if prime_mod <= 1:
+        raise ValueError("invalid prime mod")
     points = []
     for x, y in shares:
         if not isinstance(x, int):
@@ -125,7 +128,7 @@ def from_base64(data):
     decode_share = lambda s: decode_tuple(tuple(s.split("-")))
     return {
         'required_shares': data['required_shares'],
-        'prime_mod': base64.b64decode(data['prime_mod']),
+        'prime_mod': data['prime_mod'] if isinstance(data['prime_mod'], int) else base64.b64decode(data['prime_mod']),
         'shares': list(map(decode_share, data['shares']))
     }
 
@@ -142,6 +145,6 @@ def from_hex(data):
     decode_share = lambda s: decode_tuple(tuple(s.split("-")))
     return {
         'required_shares': data['required_shares'],
-        'prime_mod': binascii.unhexlify(data['prime_mod']),
+        'prime_mod': data['prime_mod'] if isinstance(data['prime_mod'], int) else binascii.unhexlify(data['prime_mod']),
         'shares': list(map(decode_share, data['shares']))
     }

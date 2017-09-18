@@ -95,16 +95,27 @@ It is possible to explicitly choose the source of randomness, as the following c
 ```
 
 #### Prime modulus
-By default, the function ````shamir.split_secret```` chooses the modulus from a list of known primes based on the length of the secret. It is also possible to specify the prime modulus to be used, as the following code illustrates. In order to split an _n_-byte secret, a prime greater than 2<sup>8n+8</sup> must be provided (see implementation details).
+By default, the function ````shamir.split_secret```` chooses the modulus from a list of known primes based on the length of the secret. It is also possible to specify the prime modulus to be used, as the following code illustrates. This is especially useful for large secrets: by choosing an easily representable prime (such as a [Mersenne Prime](https://en.wikipedia.org/wiki/Mersenne_prime)), you can distribute the prime alongside the share to each participant with little overhead.
+In order to split an _n_-byte secret, a prime greater than 2<sup>8n+8</sup> must be provided (see implementation details).
 
 _Warning_: if you follow this approach, please make sure that the provided modulus is indeed a prime number.
 
+##### Splitting secret into shares
 ```python
 >>> from sslib import shamir
 >>> required_shares = 2
 >>> distributed_shares = 5
 >>> shamir.to_base64(shamir.split_secret("this is my secret".encode('ascii'), required_shares, distributed_shares, prime_mod=2**607-1))
 {'required_shares': 2, 'prime_mod': 'f////////////////////////////////////////////////////////////////////////////////////////////////////w==', 'shares': ['1-cHBzILxFiPMcv3pmK1SHQoxRIn47n+JsrK1xv+1h86iTmEOK2IXUk/RGkskGnEDbWYx7gI3bADZD9K1GHMqTEnYVwtFGdcHSzLdMXA==', '2-YODmQXiLEeY5fvTMVqkOhRiiRPx3P8TZWVrjf9rD51EnMIcVsQupJ+iNJZINOIG2sxj3ARu2AGyH6TAX0SuzBIK4ZTUTyxBANfwzRQ==', '3-UVFZYjTQmtlWPm8ygf2Vx6TzZ3qy36dGBghVP8gl2vm6yMqgiZF9u9zTuFsT1MKSDKVygamRAKLL3bLphYzS9o9bB5jhIF6tn0EaLg==', '4-QcHMgvEWI8xy/emYrVIdCjFEifjuf4mysrXG/7WHzqJOYQ4rYhdST9EaSyQacQNtZjHuAjdsANkP0jW7Oe3y6Jv9qfyuda0bCIYBFw==', '5-MjI/o61brL+PvWP+2KakTL2VrHcqH2wfX2M4v6Lpwkrh+VG2Op0m48Vg3e0hDURIv75pgsVHAQ9TxriM7k8S2qigTGB7yvuIccroAA==']}
+```
+
+##### Recovering secret from shares
+
+```python
+>>> from sslib import shamir
+>>> data = {'required_shares': 2, 'prime_mod': 2**607-1, 'shares': ['1-cHBzILxFiPMcv3pmK1SHQoxRIn47n+JsrK1xv+1h86iTmEOK2IXUk/RGkskGnEDbWYx7gI3bADZD9K1GHMqTEnYVwtFGdcHSzLdMXA==', '3-UVFZYjTQmtlWPm8ygf2Vx6TzZ3qy36dGBghVP8gl2vm6yMqgiZF9u9zTuFsT1MKSDKVygamRAKLL3bLphYzS9o9bB5jhIF6tn0EaLg==']}
+>>> shamir.recover_secret(shamir.from_base64(data)).decode('ascii')
+'this is my secret'
 ```
 
 ### Limitations
