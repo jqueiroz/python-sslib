@@ -108,7 +108,7 @@ _Warning_: if you follow this approach, please make sure that the provided modul
 ```
 
 ### Limitations
-The current implementation of Shamir's algorithm only supports splitting secrets of up to ~26.3 KiB. While splitting larger secrets is theoretically possible, recovery from shares becomes increasingly slower. On my computer, recovering a 26 KiB secret from three shares takes around 0.9s.
+The current implementation of Shamir's algorithm only supports splitting secrets of up to ~26.3 KiB. While splitting larger secrets is theoretically possible, recovery from shares becomes increasingly slower. On my computer (AMD FX-8300), recovering a 26 KiB secret from three shares takes around 0.9s.
 
 The recommended approach for larger secrets is to perform encryption using a symmetric-key algorithm (such as AES) and then split the encryption key.
 
