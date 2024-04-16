@@ -113,7 +113,7 @@ def recover_secret(data):
         if not isinstance(y, bytes):
             raise TypeError("the second entry of each a share must be an array of bytes")
         points.append((x, util.int_from_bytes(y)))
-    return util.int_to_bytes(lagrange_interpolation(0, points, prime_mod))[1:]
+    return util.int_to_bytes(lagrange_interpolation(0, points, prime_mod))
 
 def to_base64(data):
     encode_share = lambda xy: str(xy[0]) + "-" + base64.b64encode(xy[1]).decode('ascii')
