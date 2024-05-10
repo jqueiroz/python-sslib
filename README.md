@@ -82,17 +82,7 @@ In the output of ````shamir.split_secret````, the prime modulus is represented a
 
 ### Optional parameters
 #### Randomness source
-By default, the function ````shamir.split_secret```` uses either ````randomness.RandomReader```` or ````randomness.UrandomReader```` as the source of randomness, depending on the size of the secret. Under Unix, the former reads random bytes from _/dev/random_, while the latter reads from _/dev/urandom_. Under Windows, both classes take bytes from _CryptGenRandom_.
-
-It is possible to explicitly choose the source of randomness, as the following code illustrates.
-
-```python
->>> from sslib import shamir, randomness
->>> required_shares = 2
->>> distributed_shares = 5
->>> shamir.to_base64(shamir.split_secret("this is my secret".encode('ascii'), required_shares, distributed_shares, randomness_source=randomness.UrandomReader()))
-{'required_shares': 2, 'prime_mod': 'AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhQ==', 'shares': ['1-f9lIXSnvvJDKcg00a70hvT+a8mxFk1PG', '2-/7KQulPfTq0seqdIbgcjDQYVcXMntEIY', '3-f4vZF33O4MmOg0FccFEkXMyP8HoJ1S/l', '4-/2UhdKe+cuXwi9twcpslrJMKb4Dr9h43', '5-fz5p0dGuBQJSlHWEdOUm/FmE7ofOFwwE']}
-```
+```shamir.split_secret``` now uses python ```secrets [PEP 506]``` library as a randomness source.
 
 #### Prime modulus
 By default, the function ````shamir.split_secret```` chooses the modulus from a list of known primes based on the length of the secret. It is also possible to specify the prime modulus to be used, as the following code illustrates. This is especially useful for large secrets: by choosing an easily representable prime (such as a [Mersenne Prime](https://en.wikipedia.org/wiki/Mersenne_prime)), you can distribute the prime alongside the share to each participant with little overhead.

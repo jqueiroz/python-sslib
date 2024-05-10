@@ -1,8 +1,8 @@
 from .. import util
-from .. import randomness
 import warnings
 import base64
 import binascii
+from secrets import token_bytes
 
 class Polynomial:
     def __init__(self, prime_mod, coefficients):
@@ -69,22 +69,21 @@ def split_secret(secret_bytes, required_shares, distributed_shares, **kwargs):
     prime_mod = kwargs.get('prime_mod', util.select_prime_larger_than(largest_representable_secret))
     if largest_representable_secret >= prime_mod:
         raise ValueError("prime mod is not large enough")
-    prime_bytes = util.required_bytes_given_value(prime_mod-1)
-    with kwargs.get('randomness_source', randomness.RandomReader() if secret_length <= 65 else randomness.UrandomReader()) as randomness_source:
-        secret = util.int_from_bytes(secret_bytes)
-        coefficients = []
-        for i in range(1, required_shares):
-            coefficients.append(util.int_from_bytes(randomness_source.next_bytes(prime_bytes)) % prime_mod)
-        coefficients.append(secret)
-        polynomial = Polynomial(prime_mod, coefficients)
-        shares = []
-        for i in range(1, distributed_shares+1):
-            shares.append((i, util.int_to_bytes(polynomial.evaluate(i))))
-        return {
-            'required_shares': required_shares,
-            'prime_mod': util.int_to_bytes(prime_mod),
-            'shares': shares,
-        }
+    prime_bytes = util.required_bytes_given_value(prime_mod - 1)
+    secret = util.int_from_bytes(secret_bytes)
+    coefficients = []
+    for i in range(1, required_shares):
+        coefficients.append(util.int_from_bytes(token_bytes(prime_bytes)) % prime_mod)
+    coefficients.append(secret)
+    polynomial = Polynomial(prime_mod, coefficients)
+    shares = []
+    for i in range(1, distributed_shares + 1):
+        shares.append((i, util.int_to_bytes(polynomial.evaluate(i))))
+    return {
+        "required_shares": required_shares,
+        "prime_mod": util.int_to_bytes(prime_mod),
+        "shares": shares,
+    }
 
 def recover_secret(data):
     shares = data.get('shares')
